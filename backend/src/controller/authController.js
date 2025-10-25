@@ -6,6 +6,7 @@ import Session from '../models/Session.js';
 
 const ACCESS_TOKEN_TTL = '30m';
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
+
 export const register = async (req, res) => {
   try {
     const { username, password, email, firstName, lastName } = req.body;
@@ -54,12 +55,15 @@ export const logIn = async (req, res) => {
         .status(401)
         .json({ message: 'Username or password is incorrect' });
     }
+
+    // check password
     const passwordCorrect = await bcrypt.compare(password, user.hashedPassword);
     if (!passwordCorrect) {
       return res
         .status(401)
         .json({ message: 'Username or password is incorrect' });
     }
+
     // if correct create accessToken with  JWT
     const accessToken = jwt.sign(
       { userId: user._id },
@@ -92,6 +96,23 @@ export const logIn = async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const logOut = async (req, res) => {
+  try {
+    //get refreshToken from cookie
+    const token = req.cookies?.refreshToken;
+    if (token) {
+      //delete refreshToken from Session
+      await Session.deleteOne({ refreshToken: token });
+      //clear cookie
+      res.clearCookie('refreshToken');
+    }
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error('Logout error:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
