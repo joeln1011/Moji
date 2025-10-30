@@ -7,7 +7,7 @@ import Session from '../models/Session.js';
 const ACCESS_TOKEN_TTL = '30m';
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
 
-export const register = async (req, res) => {
+export const signUp = async (req, res) => {
   try {
     const { username, password, email, firstName, lastName } = req.body;
     if (!username || !password || !email || !firstName || !lastName) {
@@ -33,12 +33,12 @@ export const register = async (req, res) => {
     // return
     return res.sendStatus(204);
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('Sign Up error:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-export const logIn = async (req, res) => {
+export const signIn = async (req, res) => {
   try {
     //get inputs
     const { username, password } = req.body;
@@ -100,7 +100,7 @@ export const logIn = async (req, res) => {
   }
 };
 
-export const logOut = async (req, res) => {
+export const signOut = async (req, res) => {
   try {
     //get refreshToken from cookie
     const token = req.cookies?.refreshToken;
@@ -112,7 +112,7 @@ export const logOut = async (req, res) => {
     }
     return res.sendStatus(204);
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error('Sign Out error:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };

@@ -7,8 +7,10 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Label } from '../ui/label';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useNavigate } from 'react-router';
 
-const registerSchema = z.object({
+const signUpSchema = z.object({
   firstname: z.string().min(1, 'First name is required'),
   lastname: z.string().min(1, 'Last name is required'),
   username: z.string().min(3, 'Username must be at least 3 characters long'),
@@ -22,22 +24,27 @@ const registerSchema = z.object({
     ),
 });
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
+type SignUpFormValues = z.infer<typeof signUpSchema>;
 
-export function SignupForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const { signUp } = useAuthStore();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpSchema),
   });
-  const onSubmit = async (data: RegisterFormValues) => {
+  const onSubmit = async (data: SignUpFormValues) => {
+    const { firstname, lastname, username, email, password } = data;
+
     //call backend api to register user
-    console.log(data);
+    await signUp(username, password, email, firstname, lastname);
+    navigate('/signin');
   };
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
@@ -139,8 +146,8 @@ export function SignupForm({
               </Button>
               <div className="text-center text-sm ">
                 Already have an account?{' '}
-                <a href="/login" className="underline underline-offset-4">
-                  Log in
+                <a href="/signin" className="underline underline-offset-4">
+                  Sign in
                 </a>
               </div>
             </div>
