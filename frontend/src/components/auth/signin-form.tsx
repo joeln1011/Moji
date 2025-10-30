@@ -6,8 +6,10 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Label } from '../ui/label';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useNavigate } from 'react-router';
 
-const logInSchema = z.object({
+const signInSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters long'),
   password: z
     .string()
@@ -18,22 +20,25 @@ const logInSchema = z.object({
     ),
 });
 
-type LogInFormValues = z.infer<typeof logInSchema>;
+type SignInFormValues = z.infer<typeof signInSchema>;
 
-export function LoginForm({
+export function SignInForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const { signIn } = useAuthStore();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LogInFormValues>({
-    resolver: zodResolver(logInSchema),
+  } = useForm<SignInFormValues>({
+    resolver: zodResolver(signInSchema),
   });
-  const onSubmit = async (data: LogInFormValues) => {
-    //call backend api to register user
-    console.log(data);
+  const onSubmit = async (data: SignInFormValues) => {
+    const { username, password } = data;
+    await signIn(username, password);
+    navigate('/');
   };
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
@@ -47,7 +52,7 @@ export function LoginForm({
                 </a>
                 <h1 className="text-2xl font-bold">Welcome to Moji</h1>
                 <p className="text-muted-foreground text-balance">
-                  Log in to your Moji account
+                  Sign in to your Moji account
                 </p>
               </div>
 
@@ -85,14 +90,14 @@ export function LoginForm({
                   </p>
                 )}
               </div>
-              {/* login button */}
+              {/* sign in button */}
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                Log In
+                Sign In
               </Button>
               <div className="text-center text-sm ">
-                Already have an account?{' '}
-                <a href="/login" className="underline underline-offset-4">
-                  Register
+                Need an account?{' '}
+                <a href="/signup" className="underline underline-offset-4">
+                  Sign Up
                 </a>
               </div>
             </div>
