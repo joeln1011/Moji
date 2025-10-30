@@ -29,6 +29,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Call API
       const { accessToken } = await authService.signIn(username, password);
       set({ accessToken });
+      await get().fetchMe();
       toast.success('Signed in successfully');
     } catch (error) {
       console.error(error);
@@ -46,6 +47,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error(error);
       toast.error('Sign out failed');
+    }
+  },
+
+  fetchMe: async () => {
+    try {
+      set({ loading: true });
+      const user = await authService.fetchMe();
+      set({ user });
+    } catch (error) {
+      console.error(error);
+      set({ user: null, accessToken: null });
+      toast.error('Session expired. Please sign in again.');
+    } finally {
+      set({ loading: false });
     }
   },
 }));
