@@ -1,8 +1,35 @@
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router';
 
 const ProtectedRoute = () => {
-  const { accessToken, user, loading } = useAuthStore();
+  const { accessToken, user, loading, refresh, fetchMe } = useAuthStore();
+  const [starting, setStarting] = useState(true);
+  const init = async () => {
+    // If we have an access token but no user, fetch the user
+    if (accessToken) {
+      await refresh();
+    }
+
+    if (accessToken && !user) {
+      await fetchMe();
+    }
+
+    setStarting(false);
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  if (starting || loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
   if (!accessToken) {
     return <Navigate to="/signin" replace />;
   }
