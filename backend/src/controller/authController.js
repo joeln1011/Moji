@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Session from '../models/Session.js';
 
-const ACCESS_TOKEN_TTL = '30m';
+const ACCESS_TOKEN_TTL = '30s';
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
 
 export const signUp = async (req, res) => {
@@ -113,6 +113,40 @@ export const signOut = async (req, res) => {
     return res.sendStatus(204);
   } catch (error) {
     console.error('Sign Out error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// creeate new access token using refresh token
+export const refreshToken = async (req, res) => {
+  try {
+    // get refreshToken from cookie
+    const token = req.cookies?.refreshToken;
+    if (!token) {
+      return res.status(401).json({ message: 'No refresh token provided' });
+    }
+    // compare token with db
+    const session = await Session.findOne({ refreshToken: token });
+    if (!session) {
+      return res.status(403).json({ message: 'Invalid refresh token' });
+    }
+
+    // check expiration
+    if (session.expiresAt < new Date()) {
+      return res.status(403).json({ message: 'Refresh token expired' });
+    }
+
+    // create new access token
+    const accessToken = jwt.sign(
+      { userId: session.userId },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: ACCESS_TOKEN_TTL }
+    );
+
+    // return new access token
+    return res.status(200).json({ accessToken });
+  } catch (error) {
+    console.error('Refresh Token error:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
