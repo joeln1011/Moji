@@ -62,7 +62,7 @@ export const acceptFriendRequests = async (req, res) => {
     if (!request) {
       return res.status(404).json({ message: 'Friend request not found' });
     }
-    if (request.to.toString() !== userId) {
+    if (request.to.toString() !== userId.toString()) {
       return res
         .status(403)
         .json({ message: 'Not authorized to accept this friend request' });
@@ -94,13 +94,13 @@ export const acceptFriendRequests = async (req, res) => {
 
 export const declineFriendRequests = async (req, res) => {
   try {
-    const [requestId] = req.params;
-    const userid = req.user._id;
+    const { requestId } = req.params;
+    const userId = req.user._id;
     const request = await FriendRequests.findById(requestId);
     if (!request) {
       return res.status(404).json({ message: 'Friend request not found' });
     }
-    if (request.to.toString() !== userid.toString()) {
+    if (request.to.toString() !== userId.toString()) {
       return res
         .status(403)
         .json({ message: 'Not authorized to decline this friend request' });
@@ -117,6 +117,20 @@ export const declineFriendRequests = async (req, res) => {
 
 export const getAllFriends = async (req, res) => {
   try {
+    const userId = req.user._id;
+    const friendships = await Friends.find({
+      $or: [{ userA: userId }, { userB: userId }],
+    })
+      .populate('userA', '_id displayName avatarUrl')
+      .populate('userB', '_id displayName avatarUrl')
+      .lean();
+    if (!friendships.length) {
+      return res.status(200).json({ friends: [] });
+    }
+    const friends = friendships.map((f) =>
+      f.userA._id.toString() === userId.toString() ? f.userB : f.userA
+    );
+    return res.status(200).json({ friends });
   } catch (error) {
     console.error('Error getting all friends:', error);
     res.status(500).json({ message: 'Failed to get all friends' });
@@ -125,6 +139,7 @@ export const getAllFriends = async (req, res) => {
 
 export const getFriendRequests = async (req, res) => {
   try {
+    const 
   } catch (error) {
     console.error('Error getting all friend requests:', error);
     res.status(500).json({ message: 'Failed to get all friend requests' });
