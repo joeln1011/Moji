@@ -12,7 +12,7 @@ const participantsSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const groupsSchema = new mongoose.Schema(
@@ -26,10 +26,10 @@ const groupsSchema = new mongoose.Schema(
       ref: 'User',
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
-const lastMessagesSchema = new mongoose.Schema(
+const lastMessageSchema = new mongoose.Schema(
   {
     _id: { type: String },
     content: {
@@ -45,14 +45,16 @@ const lastMessagesSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { id: false }
+  {
+    _id: false,
+  },
 );
 
 const conversationsSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ['private', 'group'],
+      enum: ['direct', 'group'],
       required: true,
     },
     participants: {
@@ -60,7 +62,7 @@ const conversationsSchema = new mongoose.Schema(
       required: true,
     },
     group: {
-      type: [groupsSchema],
+      type: groupsSchema,
     },
     lastMessageAt: {
       type: Date,
@@ -72,16 +74,16 @@ const conversationsSchema = new mongoose.Schema(
       },
     ],
     lastMessage: {
-      type: lastMessagesSchema,
+      type: lastMessageSchema,
       default: null,
     },
-    unreadCount: {
+    unreadCounts: {
       type: Map,
       of: Number,
       default: {},
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 conversationsSchema.index({
@@ -89,5 +91,5 @@ conversationsSchema.index({
   lastMessageAt: -1,
 });
 
-const Conversations = mongoose.model('Conversations', conversationsSchema);
-export default Conversations;
+const Conversation = mongoose.model('Conversations', conversationsSchema);
+export default Conversation;

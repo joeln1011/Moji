@@ -23,11 +23,11 @@ const messagesSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-messageSchema.index({ conversationId: 1, createdAt: -1 });
+messagesSchema.index({ conversationId: 1, createdAt: -1 });
 
-const Messages = mongoose.model('Messages', messagesSchema);
+const Message = mongoose.model('Messages', messagesSchema);
 
-export default Messages;
+export default Message;
