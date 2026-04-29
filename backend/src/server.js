@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import authRoute from './routes/authRoute.js';
 import userRoute from './routes/userRoute.js';
 import friendRoute from './routes/friendRoute.js';
+import messageRoute from './routes/messageRoute.js';
 import cookieParser from 'cookie-parser';
 import { connectDb } from './libs/mongodb.js';
 import { protectedRoute } from './middlewares/authMiddleware.js';
@@ -16,6 +17,7 @@ const PORT = process.env.PORT || 5001;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+
 // Public Routes
 app.use('/api/auth', authRoute);
 
@@ -23,6 +25,7 @@ app.use('/api/auth', authRoute);
 app.use(protectedRoute);
 app.use('/api/users', userRoute);
 app.use('/api/friends', friendRoute);
+app.use('/api/messages', messageRoute);
 
 connectDb().then(() => {
   app.listen(PORT, () => {

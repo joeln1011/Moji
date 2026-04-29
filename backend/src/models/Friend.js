@@ -13,7 +13,7 @@ const friendsSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 friendsSchema.pre('save', async function (next) {
@@ -28,6 +28,6 @@ friendsSchema.pre('save', async function (next) {
 
 friendsSchema.index({ userA: 1, userB: 1 }, { unique: true });
 
-const Friends = mongoose.model('Friends', friendsSchema);
+const Friend = mongoose.model('Friends', friendsSchema);
 
-export default Friends;
+export default Friend;

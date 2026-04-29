@@ -14,13 +14,13 @@ const friendRequestsSchema = new mongoose.Schema(
     },
     message: { type: String, maxLength: 300 },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 friendRequestsSchema.index({ from: 1, to: 1 }, { unique: true });
 friendRequestsSchema.index({ from: 1 });
 friendRequestsSchema.index({ to: 1 });
 
-const FriendRequests = mongoose.model('FriendRequests', friendRequestsSchema);
+const FriendRequest = mongoose.model('FriendRequests', friendRequestsSchema);
 
-export default FriendRequests;
+export default FriendRequest;

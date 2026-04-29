@@ -1,6 +1,6 @@
-import Friends from '../models/Friends.js';
+import Friends from '../models/Friend.js';
 import User from '../models/User.js';
-import FriendRequests from '../models/FriendRequests.js';
+import FriendRequests from '../models/FriendRequest.js';
 
 export const sendFriendRequests = async (req, res) => {
   try {
@@ -128,7 +128,7 @@ export const getAllFriends = async (req, res) => {
       return res.status(200).json({ friends: [] });
     }
     const friends = friendships.map((f) =>
-      f.userA._id.toString() === userId.toString() ? f.userB : f.userA
+      f.userA._id.toString() === userId.toString() ? f.userB : f.userA,
     );
     return res.status(200).json({ friends });
   } catch (error) {
@@ -139,7 +139,13 @@ export const getAllFriends = async (req, res) => {
 
 export const getFriendRequests = async (req, res) => {
   try {
-    const 
+    const userId = req.user._id;
+    const populateFields = '_id username displayName avatarUrl';
+    const [sent, received] = await Promise.all([
+      FriendRequests.find({ from: userId }).populate('to', populateFields),
+      FriendRequests.find({ to: userId }).populate('from', populateFields),
+    ]);
+    res.status(200).json({ sent, received });
   } catch (error) {
     console.error('Error getting all friend requests:', error);
     res.status(500).json({ message: 'Failed to get all friend requests' });
