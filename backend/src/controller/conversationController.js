@@ -1,3 +1,4 @@
+import { join } from 'path';
 import Conversation from '../models/Conversation.js';
 import Message from '../models/Message.js';
 
@@ -61,6 +62,44 @@ export const createConversation = async (req, res) => {
   }
 };
 
-export const getConversations = async (req, res) => {};
+export const getConversations = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const conversations = await Conversation.find({
+      'participants.userId': userId,
+    })
+      .sort({ lastMessageAt: -1, updatedAt: -1 })
+      .populate({
+        path: 'participants.userId',
+        select: 'displayName avatarUrl',
+      })
+      .populate({
+        path: 'lastMessage.senderId',
+        select: 'displayName avatarUrl',
+      })
+      .populate({
+        path: 'seenBy',
+        select: 'displayName avatarUrl',
+      });
+
+    const formatted = conversations.map((convo) => {
+      const participants = (convo.participants || []).map((p) => ({
+        _id: p.userId?._id,
+        displayName: p.userId?.displayName,
+        avatarUrl: p.userId?.avatarUrl ?? null,
+        joinedAt: p.joinedAt,
+      }));
+      return {
+        ...convo.toObject(),
+        unreadCounts: convo.unreadCounts || {},
+        participants,
+      };
+    });
+    return res.status(200).json({ conversations: formatted });
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
+    return res.status(500).json({ message: 'Failed to fetch conversations' });
+  }
+};
 
 export const getMessages = async (req, res) => {};
