@@ -49,6 +49,7 @@ export const sendDirectMessage = async (req, res) => {
 
 export const sendGroupMessage = async (req, res) => {
   try {
+    
   } catch (error) {
     console.error('Error sending message:', error);
     res.status(500).json({ message: 'Failed to send message' });

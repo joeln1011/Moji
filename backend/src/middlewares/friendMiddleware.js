@@ -7,9 +7,12 @@ export const checkFriendShip = async (req, res, next) => {
   try {
     const me = req.user._id.toString();
     const recipientId = req.body?.recipientId ?? null;
+    const memberIds = req.body?.memberIds ?? null;
 
-    if (!recipientId) {
-      return res.status(400).json({ message: 'Recipient ID is required' });
+    if (!recipientId && memberIds.length === 0) {
+      return res
+        .status(400)
+        .json({ message: 'Recipient ID or member IDs are required' });
     }
 
     if (recipientId) {
@@ -22,7 +25,22 @@ export const checkFriendShip = async (req, res, next) => {
       }
       return next();
     }
-    //todo check group conversation
+
+    const friendCheck = memberIds.map(async (memberId) => {
+      const [userA, userB] = pair(me, memberId);
+      const friend = await Friend.findOne({ userA, userB });
+      return friend ? null : memberId;
+    });
+
+    const results = await Promise.all(friendCheck);
+    const notFriends = results.filter(Boolean);
+
+    if (notFriends.length > 0) {
+      return res
+        .status(403)
+        .json({ message: 'You are not friends with some users', notFriends });
+    }
+    next();
   } catch (error) {
     console.error('Error checking friendship:', error);
     return res.status(500).json({ message: 'Internal server error' });
