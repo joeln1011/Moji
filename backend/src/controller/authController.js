@@ -68,7 +68,7 @@ export const signIn = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: ACCESS_TOKEN_TTL }
+      { expiresIn: ACCESS_TOKEN_TTL },
     );
 
     //create refreshToken with JWT
@@ -140,7 +140,7 @@ export const refreshToken = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: session.userId },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: ACCESS_TOKEN_TTL }
+      { expiresIn: ACCESS_TOKEN_TTL },
     );
 
     // return new access token
