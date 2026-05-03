@@ -15,12 +15,12 @@ import {
 } from '@/components/ui/sidebar';
 import { Moon, Sun } from 'lucide-react';
 import { Switch } from '../ui/switch';
-import CreateNewChat from '../chat/CreateNewChat';
 import NewGroupChatModal from '../chat/NewGroupChatModal';
-import GroupChatList from '../chat/GroupChatList';
 import AddFriendModal from '../chat/AddFriendModal';
 import DirectMessageList from '../chat/DirectMessageList';
 import { useThemeStore } from '@/stores/useThemeStore';
+import CreateNewChat from '../chat/CreateNewChat';
+import GroupChatList from '../chat/GroupChatList';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isDark, toggleTheme } = useThemeStore();
@@ -56,8 +56,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       {/* Content */}
-      <SidebarContent>
-        {/* New chat */}
+      <SidebarContent className="beautiful-scrollbar">
+        {/* New Chat */}
         <SidebarGroup>
           <SidebarGroupContent>
             <CreateNewChat />
@@ -67,9 +67,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Group Chat */}
         <SidebarGroup>
           <SidebarGroupLabel className="uppercase">
-            Group Chats
+            Group Chat
           </SidebarGroupLabel>
-          <SidebarGroupAction title="Create Group" className="cursor-pointer">
+          <SidebarGroupAction
+            title="Create New Group"
+            className="cursor-pointer"
+          >
             <NewGroupChatModal />
           </SidebarGroupAction>
           <SidebarGroupContent>
@@ -77,9 +80,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Direct Messages */}
+        {/* Dirrect Message */}
         <SidebarGroup>
-          <SidebarGroupLabel className="uppercase">Friends</SidebarGroupLabel>
+          <SidebarGroupLabel className="uppercase">Friend</SidebarGroupLabel>
 
           <SidebarGroupAction title="Add Friend" className="cursor-pointer">
             <AddFriendModal />

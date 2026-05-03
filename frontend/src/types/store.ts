@@ -33,11 +33,12 @@ export interface ChatState {
     string,
     {
       items: Message[];
-      hasMore: boolean;
+      hasMore: boolean; // infinite scroll
       nextCursor: string | null;
     }
   >;
   activeConversationId: string | null;
+  convoLoading: boolean;
   loading: boolean;
   reset: () => void;
 

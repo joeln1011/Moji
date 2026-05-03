@@ -5,9 +5,10 @@ import { Navigate, Outlet } from 'react-router';
 const ProtectedRoute = () => {
   const { accessToken, user, loading, refresh, fetchMe } = useAuthStore();
   const [starting, setStarting] = useState(true);
+
   const init = async () => {
-    // If we have an access token but no user, fetch the user
-    if (accessToken) {
+    // có thể xảy ra khi refresh trang
+    if (!accessToken) {
       await refresh();
     }
 
@@ -25,7 +26,7 @@ const ProtectedRoute = () => {
   if (starting || loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Loading...
+        Đang tải trang...
       </div>
     );
   }
@@ -33,6 +34,7 @@ const ProtectedRoute = () => {
   if (!accessToken) {
     return <Navigate to="/signin" replace />;
   }
+
   return <Outlet></Outlet>;
 };
 

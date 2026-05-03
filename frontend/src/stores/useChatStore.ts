@@ -9,27 +9,27 @@ export const useChatStore = create<ChatState>()(
       conversations: [],
       messages: {},
       activeConversationId: null,
+      convoLoading: false,
       loading: false,
 
-      setActiveConversation: (id) => {
-        set({ activeConversationId: id });
-      },
+      setActiveConversation: (id) => set({ activeConversationId: id }),
       reset: () => {
         set({
           conversations: [],
           messages: {},
           activeConversationId: null,
           loading: false,
+          convoLoading: false,
         });
       },
       fetchConversations: async () => {
         try {
-          set({ loading: true });
-          const conversations = await chatService.fetchConversations();
-          set({ conversations, loading: false });
+          set({ convoLoading: true });
+          const { conversations } = await chatService.fetchConversations();
+          set({ conversations, convoLoading: false });
         } catch (error) {
           console.error('Error fetching conversations:', error);
-          set({ loading: false });
+          set({ convoLoading: false });
         }
       },
     }),
