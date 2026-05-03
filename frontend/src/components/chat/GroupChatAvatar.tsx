@@ -26,11 +26,11 @@ const GroupChatAvatar = ({ participants, type }: GroupChatAvatarProps) => {
     <div className="relative flex -space-x-2 *:data-[slot=avatar]:ring-background *:data-[slot=avatar]:ring-2">
       {avatars}
       {/* more than 4 avatars will render ...*/}
-      {
+      {participants.length > limit && (
         <div className="flex items-center z-10 justify-center size-8 rounded-full bg-muted ring-2 ring-background text-muted-foreground">
           <Ellipsis className="size-4" />
         </div>
-      }
+      )}
     </div>
   );
 };
