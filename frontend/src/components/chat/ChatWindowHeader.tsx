@@ -2,10 +2,10 @@ import type { Conversation } from '@/types/chat';
 import { SidebarTrigger } from '../ui/sidebar';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useChatStore } from '@/stores/useChatStore';
-import { Separator } from '@radix-ui/react-separator';
 import UserAvatar from './UserAvatar';
 import StatusBadge from './StatusBadge';
 import GroupChatAvatar from './GroupChatAvatar';
+import { Separator } from '../ui/separator';
 
 const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
   const { conversations, activeConversationId } = useChatStore();
