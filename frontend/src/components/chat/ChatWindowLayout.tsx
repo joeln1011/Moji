@@ -11,7 +11,6 @@ const ChatWindowLayout = () => {
     activeConversationId,
     conversations,
     messageLoading: loading,
-    messages,
   } = useChatStore();
 
   const selectedconvo =
@@ -28,7 +27,7 @@ const ChatWindowLayout = () => {
   return (
     <SidebarInset className="flex flex-col flex-1 h-full overflow-hidden rounded-sm shadow-md">
       {/* Header */}
-      <ChatWindowHeader />
+      <ChatWindowHeader chat={selectedconvo} />
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto bg-primary-foreground">
@@ -36,7 +35,7 @@ const ChatWindowLayout = () => {
       </div>
 
       {/* Footer */}
-      <MessageInput />
+      <MessageInput selectedConvo={selectedconvo} />
     </SidebarInset>
   );
 };
