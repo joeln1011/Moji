@@ -1,4 +1,3 @@
-import { join } from 'path';
 import Conversation from '../models/Conversation.js';
 import Message from '../models/Message.js';
 
@@ -130,5 +129,71 @@ export const getMessages = async (req, res) => {
   } catch (error) {
     console.error('Error fetching messages:', error);
     return res.status(500).json({ message: 'Failed to fetch messages' });
+  }
+};
+
+export const getUserConversationsForSocketIO = async (userId) => {
+  try {
+    const conversations = await Conversation.find(
+      { 'participants.userId': userId },
+      { _id: 1 },
+    );
+    return conversations.map((c) => c._id.toString());
+  } catch (error) {
+    console.error('Error fetching user conversations:', error);
+    return [];
+  }
+};
+
+export const markAsSeen = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user._id.toString();
+
+    const conversation = await Conversation.findById(conversationId).lean();
+
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+    const last = conversation.lastMessage;
+
+    if (!last) {
+      return res.status(200).json({ message: 'No messages to mark as seen' });
+    }
+
+    if (last.senderId.toString() === userId) {
+      return res
+        .status(200)
+        .json({ message: 'Sender no need to mark as seen' });
+    }
+
+    const updated = await Conversation.findOneAndUpdate(
+      conversationId,
+      {
+        $addToSet: { seenBy: userId },
+        $set: { [`unreadCounts.${userId}`]: 0 },
+      },
+      {
+        new: true,
+      },
+    );
+    io.to(conversationId).emit('read-message', {
+      conversation: updated,
+      lastMessage: {
+        _id: updated?.lastMessage._id,
+        content: updated?.lastMessage.content,
+        createdAt: updated?.lastMessage.createdAt,
+        sender: { _id: updated?.lastMessage.senderId },
+      },
+    });
+
+    return res.status(200).json({
+      message: 'Messages marked as seen',
+      seenBy: updated?.seenBy || [],
+      myUnreadCount: updated?.unreadCounts[userId] || 0,
+    });
+  } catch (error) {
+    console.error('Error marking messages as seen:', error);
+    res.status(500).json({ message: 'Failed to mark messages as seen' });
   }
 };
