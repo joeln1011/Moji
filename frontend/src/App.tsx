@@ -7,12 +7,12 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useThemeStore } from './stores/useThemeStore';
 import { useEffect } from 'react';
 import { useAuthStore } from './stores/useAuthStore';
-import { userSocketStore } from './stores/useSocketStore';
+import { useSocketStore } from './stores/useSocketStore';
 
 function App() {
   const { isDark, setTheme } = useThemeStore();
   const { accessToken } = useAuthStore();
-  const { connectSocket, disconnectSocket } = userSocketStore();
+  const { connectSocket, disconnectSocket } = useSocketStore();
 
   useEffect(() => {
     setTheme(isDark);
