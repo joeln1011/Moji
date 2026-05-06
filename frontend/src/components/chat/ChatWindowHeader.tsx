@@ -2,14 +2,16 @@ import type { Conversation } from '@/types/chat';
 import { SidebarTrigger } from '../ui/sidebar';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useChatStore } from '@/stores/useChatStore';
+import { Separator } from '../ui/separator';
 import UserAvatar from './UserAvatar';
 import StatusBadge from './StatusBadge';
 import GroupChatAvatar from './GroupChatAvatar';
-import { Separator } from '../ui/separator';
+import { useSocketStore } from '@/stores/useSocketStore';
 
 const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
   const { conversations, activeConversationId } = useChatStore();
   const { user } = useAuthStore();
+  const { onlineUsers } = useSocketStore();
   let otherUser;
 
   chat = chat ?? conversations.find((c) => c._id === activeConversationId);
@@ -47,7 +49,13 @@ const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
                   avatarUrl={otherUser?.avatarUrl || undefined}
                 />
                 {/* todo: socket io */}
-                <StatusBadge status="offline" />
+                <StatusBadge
+                  status={
+                    onlineUsers.includes(otherUser?._id ?? '')
+                      ? 'online'
+                      : 'offline'
+                  }
+                />
               </>
             ) : (
               <GroupChatAvatar
