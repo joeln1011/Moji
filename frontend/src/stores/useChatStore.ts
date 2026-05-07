@@ -130,7 +130,7 @@ export const useChatStore = create<ChatState>()(
           }
           set((state) => {
             if (prevItems.some((m) => m._id === message._id)) {
-              return state; // avoid duplicates
+              return state;
             }
             return {
               messages: {
@@ -138,7 +138,7 @@ export const useChatStore = create<ChatState>()(
                 [convoId]: {
                   items: [...prevItems, message],
                   hasMore: state.messages[convoId].hasMore,
-                  nextCursor: state.messages[convoId].nextCursor ?? undefined,
+                  nextCursor: state.messages[convoId].nextCursor ?? null,
                 },
               },
             };
@@ -147,12 +147,45 @@ export const useChatStore = create<ChatState>()(
           console.error('Error adding message:', error);
         }
       },
+
       updateConversation: (conversation) => {
         set((state) => ({
           conversations: state.conversations.map((c) =>
             c._id === conversation._id ? { ...c, ...conversation } : c,
           ),
         }));
+      },
+
+      markAsSeen: async () => {
+        try {
+          const { user } = useAuthStore.getState();
+          const { activeConversationId, conversations } = get();
+          if (!activeConversationId || !user) return;
+          const convo = conversations.find(
+            (c) => c._id === activeConversationId,
+          );
+
+          if (!convo) return;
+
+          if ((convo.unreadCounts?.[user._id] ?? 0) === 0) return;
+
+          await chatService.markAsSeen(activeConversationId);
+          set((state) => ({
+            conversations: state.conversations.map((c) =>
+              c._id === activeConversationId
+                ? {
+                    ...c,
+                    unreadCounts: {
+                      ...c.unreadCounts,
+                      [user._id]: 0,
+                    },
+                  }
+                : c,
+            ),
+          }));
+        } catch (error) {
+          console.error('Error marking messages as seen:', error);
+        }
       },
     }),
     {
