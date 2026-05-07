@@ -5,18 +5,34 @@ import { SidebarInset } from '../ui/sidebar';
 import ChatWindowHeader from './ChatWindowHeader';
 import ChatWindowBody from './ChatWindowBody';
 import MessageInput from './MessageInput';
+import { useEffect } from 'react';
 
 const ChatWindowLayout = () => {
   const {
     activeConversationId,
     conversations,
     messageLoading: loading,
+    markAsSeen,
   } = useChatStore();
 
-  const selectedconvo =
+  const selectedConvo =
     conversations.find((c) => c._id === activeConversationId) ?? null;
 
-  if (!selectedconvo) {
+  useEffect(() => {
+    if (!selectedConvo) {
+      return;
+    }
+    const markSeen = async () => {
+      try {
+        await markAsSeen();
+      } catch (error) {
+        console.error('Error marking messages as seen:', error);
+      }
+    };
+    markSeen();
+  }, [markAsSeen, selectedConvo]);
+
+  if (!selectedConvo) {
     return <ChatWelcomeScreen />;
   }
 
@@ -27,7 +43,7 @@ const ChatWindowLayout = () => {
   return (
     <SidebarInset className="flex flex-col flex-1 h-full overflow-hidden rounded-sm shadow-md">
       {/* Header */}
-      <ChatWindowHeader chat={selectedconvo} />
+      <ChatWindowHeader chat={selectedConvo} />
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto bg-primary-foreground">
@@ -35,7 +51,7 @@ const ChatWindowLayout = () => {
       </div>
 
       {/* Footer */}
-      <MessageInput selectedConvo={selectedconvo} />
+      <MessageInput selectedConvo={selectedConvo} />
     </SidebarInset>
   );
 };
