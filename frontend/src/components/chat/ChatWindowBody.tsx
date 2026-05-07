@@ -2,6 +2,7 @@ import { useChatStore } from '@/stores/useChatStore';
 import ChatWelcomeScreen from './ChatWelcomeScreen';
 import MessageItem from './MessageItem';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const ChatWindowBody = () => {
   const {
@@ -15,7 +16,7 @@ const ChatWindowBody = () => {
   >('delivered');
 
   const messages = allMessages[activeConversationId!]?.items ?? [];
-
+  const hasMore = allMessages[activeConversationId!]?.hasMore ?? false;
   const selectedConvo = conversations.find(
     (c) => c._id === activeConversationId,
   );
@@ -52,17 +53,28 @@ const ChatWindowBody = () => {
   }
   return (
     <div className="p-4 bg-primary-foreground. h-full flex flex-col overflow-hidden">
-      <div className="flex flex-col overflow-y-auto overflow-x-hidden beautifull-scrollbar">
-        {messages.map((message, index) => (
-          <MessageItem
-            key={message._id ?? index}
-            message={message}
-            index={index}
-            messages={messages}
-            selectedConvo={selectedConvo}
-            lastMessageStatus={lastMessageStatus}
-          />
-        ))}
+      <div
+        id="scrollableDiv"
+        className="flex flex-col overflow-y-auto overflow-x-hidden beautifull-scrollbar"
+      >
+        <InfiniteScroll
+          dataLength={messages.length}
+          next={() => console.log('Loading...')}
+          hasMore={hasMore}
+          scrollableTarget="scrollableDiv"
+          loader={<p>Loading....</p>}
+        >
+          {messages.map((message, index) => (
+            <MessageItem
+              key={message._id ?? index}
+              message={message}
+              index={index}
+              messages={messages}
+              selectedConvo={selectedConvo}
+              lastMessageStatus={lastMessageStatus}
+            />
+          ))}
+        </InfiniteScroll>
         <div ref={messagesEndRef}></div>
       </div>
     </div>
