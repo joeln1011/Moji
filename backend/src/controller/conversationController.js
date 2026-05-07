@@ -1,5 +1,6 @@
 import Conversation from '../models/Conversation.js';
 import Message from '../models/Message.js';
+import mongoose from 'mongoose';
 
 export const createConversation = async (req, res) => {
   try {
@@ -149,6 +150,11 @@ export const markAsSeen = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const userId = req.user._id.toString();
+    const io = req.app.get('io');
+
+    if (!mongoose.Types.ObjectId.isValid(conversationId)) {
+      return res.status(400).json({ message: 'Invalid conversation id' });
+    }
 
     const conversation = await Conversation.findById(conversationId).lean();
 
@@ -161,14 +167,19 @@ export const markAsSeen = async (req, res) => {
       return res.status(200).json({ message: 'No messages to mark as seen' });
     }
 
-    if (last.senderId.toString() === userId) {
+    const lastSenderId = last.senderId?.toString();
+    if (!lastSenderId) {
+      return res.status(200).json({ message: 'No sender to mark as seen' });
+    }
+
+    if (lastSenderId === userId) {
       return res
         .status(200)
         .json({ message: 'Sender no need to mark as seen' });
     }
 
     const updated = await Conversation.findOneAndUpdate(
-      conversationId,
+      { _id: conversationId },
       {
         $addToSet: { seenBy: userId },
         $set: { [`unreadCounts.${userId}`]: 0 },
@@ -177,20 +188,29 @@ export const markAsSeen = async (req, res) => {
         new: true,
       },
     );
-    io.to(conversationId).emit('read-message', {
-      conversation: updated,
-      lastMessage: {
-        _id: updated?.lastMessage._id,
-        content: updated?.lastMessage.content,
-        createdAt: updated?.lastMessage.createdAt,
-        sender: { _id: updated?.lastMessage.senderId },
-      },
-    });
+    if (!updated) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    if (io) {
+      io.to(conversationId).emit('read-message', {
+        conversation: updated,
+        lastMessage: {
+          _id: updated.lastMessage?._id,
+          content: updated.lastMessage?.content,
+          createdAt: updated.lastMessage?.createdAt,
+          sender: { _id: updated.lastMessage?.senderId },
+        },
+      });
+    }
 
     return res.status(200).json({
       message: 'Messages marked as seen',
-      seenBy: updated?.seenBy || [],
-      myUnreadCount: updated?.unreadCounts[userId] || 0,
+      seenBy: updated.seenBy || [],
+      myUnreadCount:
+        updated.unreadCounts instanceof Map
+          ? updated.unreadCounts.get(userId) || 0
+          : updated.unreadCounts?.[userId] || 0,
     });
   } catch (error) {
     console.error('Error marking messages as seen:', error);
