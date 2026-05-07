@@ -1,7 +1,7 @@
 import { useChatStore } from '@/stores/useChatStore';
 import ChatWelcomeScreen from './ChatWelcomeScreen';
 import MessageItem from './MessageItem';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const ChatWindowBody = () => {
   const {
@@ -21,7 +21,7 @@ const ChatWindowBody = () => {
   );
 
   //ref
-
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const lastMessage = selectedConvo?.lastMessage;
     if (!lastMessage) {
@@ -30,6 +30,14 @@ const ChatWindowBody = () => {
     const seenBy = selectedConvo?.seenBy ?? [];
     setLastMessageStatus(seenBy.length > 0 ? 'seen' : 'delivered');
   }, [selectedConvo]);
+
+  // scroll to bottom when messages change
+  useLayoutEffect(() => {
+    if (!messagesEndRef.current) {
+      return;
+    }
+    messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [activeConversationId]);
 
   if (!selectedConvo) {
     return <ChatWelcomeScreen />;
@@ -55,6 +63,7 @@ const ChatWindowBody = () => {
             lastMessageStatus={lastMessageStatus}
           />
         ))}
+        <div ref={messagesEndRef}></div>
       </div>
     </div>
   );
