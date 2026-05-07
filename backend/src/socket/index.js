@@ -12,6 +12,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+app.set('io', io);
 io.use(socketAuthMiddleware);
 
 const onlineUsers = new Map(); //{userId: socketId}
