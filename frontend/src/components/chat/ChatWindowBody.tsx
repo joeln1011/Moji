@@ -9,6 +9,7 @@ const ChatWindowBody = () => {
     activeConversationId,
     conversations,
     messages: allMessages,
+    fetchMessages,
   } = useChatStore();
 
   const [lastMessageStatus, setLastMessageStatus] = useState<
@@ -16,13 +17,16 @@ const ChatWindowBody = () => {
   >('delivered');
 
   const messages = allMessages[activeConversationId!]?.items ?? [];
+  const reversedMessages = [...messages].reverse();
   const hasMore = allMessages[activeConversationId!]?.hasMore ?? false;
   const selectedConvo = conversations.find(
     (c) => c._id === activeConversationId,
   );
-
+  const key = `scroll-${activeConversationId}`;
   //ref
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const lastMessage = selectedConvo?.lastMessage;
     if (!lastMessage) {
@@ -40,6 +44,41 @@ const ChatWindowBody = () => {
     messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [activeConversationId]);
 
+  const fetchMoreMessages = async () => {
+    if (!activeConversationId) return;
+    try {
+      await fetchMessages(activeConversationId);
+    } catch (error) {
+      console.error('Error fetching more messages:', error);
+    }
+  };
+
+  const handleScrollSave = () => {
+    const container = containerRef.current;
+    if (!container || !activeConversationId) return;
+
+    sessionStorage.setItem(
+      key,
+      JSON.stringify({
+        scrollTop: container.scrollTop,
+        scrollHeight: container.scrollHeight,
+      }),
+    );
+  };
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const item = sessionStorage.getItem(key);
+
+    if (item) {
+      const { scrollTop } = JSON.parse(item);
+      requestAnimationFrame(() => {
+        container.scrollTop = scrollTop;
+      });
+    }
+  }, [messages.length]);
   if (!selectedConvo) {
     return <ChatWelcomeScreen />;
   }
@@ -52,30 +91,38 @@ const ChatWindowBody = () => {
     );
   }
   return (
-    <div className="p-4 bg-primary-foreground. h-full flex flex-col overflow-hidden">
+    <div className="p-4 bg-primary-foreground h-full flex flex-col overflow-hidden">
       <div
         id="scrollableDiv"
-        className="flex flex-col overflow-y-auto overflow-x-hidden beautifull-scrollbar"
+        ref={containerRef}
+        onScroll={handleScrollSave}
+        className="flex flex-col-reverse overflow-y-auto overflow-x-hidden beautifull-scrollbar"
       >
+        <div ref={messagesEndRef}></div>
         <InfiniteScroll
           dataLength={messages.length}
-          next={() => console.log('Loading...')}
+          next={fetchMoreMessages}
           hasMore={hasMore}
           scrollableTarget="scrollableDiv"
           loader={<p>Loading....</p>}
+          inverse={true}
+          style={{
+            display: 'flex',
+            flexDirection: 'column-reverse',
+            overflow: 'hidden',
+          }}
         >
-          {messages.map((message, index) => (
+          {reversedMessages.map((message, index) => (
             <MessageItem
               key={message._id ?? index}
               message={message}
               index={index}
-              messages={messages}
+              messages={reversedMessages}
               selectedConvo={selectedConvo}
               lastMessageStatus={lastMessageStatus}
             />
           ))}
         </InfiniteScroll>
-        <div ref={messagesEndRef}></div>
       </div>
     </div>
   );
