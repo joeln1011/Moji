@@ -16,7 +16,7 @@ const signInSchema = z.object({
     .min(8, 'Password must be at least 8 characters long')
     .regex(
       /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/,
-      'Password must contain at least one letter and one number'
+      'Password must contain at least one letter and one number',
     ),
 });
 
@@ -68,9 +68,7 @@ export function SignInForm({
                   {...register('username')}
                 />
                 {errors.username && (
-                  <p className="text-destructive text-sm">
-                    {errors.username.message}
-                  </p>
+                  <p className="error-message">{errors.username.message}</p>
                 )}
               </div>
 
@@ -85,9 +83,7 @@ export function SignInForm({
                   {...register('password')}
                 />
                 {errors.password && (
-                  <p className="text-destructive text-sm">
-                    {errors.password.message}
-                  </p>
+                  <p className="error-message">{errors.password.message}</p>
                 )}
               </div>
               {/* sign in button */}
