@@ -7,7 +7,19 @@ export const authMe = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+export const searchUserByUsername = async (req, res) => {
+  try {
+    const { username } = req.query;
+    if (!username || username.trim() === '') {
+      return res.status(400).json({ message: 'Username is required' });
+    }
 
-export const test = async (req, res) => {
-  return res.sendStatus(204);
+    const user = await User.findOne({ username }).select(
+      '_id displayName username avatarUrl',
+    );
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.error('Search user error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };
