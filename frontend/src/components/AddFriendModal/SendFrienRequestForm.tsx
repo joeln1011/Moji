@@ -21,10 +21,10 @@ const SendFrienRequestForm = ({
   onBack,
 }: SendRequestProps) => {
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div>
+    <form onSubmit={onSubmit}>
+      <div className="space-y-4">
         <span className="success-message">
-          Found <span className="font-semibold">@{searchedUsername} !!!</span>
+          <span className="font-semibold ">@{searchedUsername} Found!!!</span>
         </span>
 
         <div className="space-y-2">

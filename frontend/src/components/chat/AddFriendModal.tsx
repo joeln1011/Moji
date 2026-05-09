@@ -12,6 +12,7 @@ import { useFriendStore } from '@/stores/useFriendStore';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import SearchForm from '../AddFriendModal/SearchForm';
+import SendFrienRequestForm from '../AddFriendModal/SendFrienRequestForm';
 
 export interface IFormValues {
   username: string;
@@ -103,7 +104,17 @@ const AddFriendModal = () => {
           </>
         )}
 
-        {isFound && <>//todo: form send friend request</>}
+        {isFound && (
+          <>
+            <SendFrienRequestForm
+              register={register}
+              loading={loading}
+              searchedUsername={searchedUsername}
+              onSubmit={handleSend}
+              onBack={() => setIsFound(null)}
+            />
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
