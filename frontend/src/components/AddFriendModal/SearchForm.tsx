@@ -47,7 +47,7 @@ const SearchForm = ({
         {isFound === false && (
           <span className="error-message">
             User not found
-            <span className="font-semibold">@{searchedUsername}</span>
+            <span className="font-semibold"> @{searchedUsername}</span>
           </span>
         )}
       </div>
@@ -72,7 +72,9 @@ const SearchForm = ({
           {loading ? (
             <span>Finding...</span>
           ) : (
-            <Search className="size-4 mr-2" />
+            <>
+              <Search className="size-4 mr-2" /> Search
+            </>
           )}
         </Button>
       </DialogFooter>
