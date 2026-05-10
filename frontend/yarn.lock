@@ -2018,7 +2018,7 @@ acorn@^8.15.0:
 
 add@^2.0.6:
   version "2.0.6"
-  resolved "https://registry.npmjs.org/add/-/add-2.0.6.tgz"
+  resolved "https://registry.yarnpkg.com/add/-/add-2.0.6.tgz#248f0a9f6e5a528ef2295dbeec30532130ae2235"
   integrity sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==
 
 agent-base@^7.1.2:
@@ -4550,10 +4550,10 @@ setprototypeof@~1.2.0:
   resolved "https://registry.npmjs.org/setprototypeof/-/setprototypeof-1.2.0.tgz"
   integrity sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==
 
-shadcn@^4.6.0:
-  version "4.6.0"
-  resolved "https://registry.npmjs.org/shadcn/-/shadcn-4.6.0.tgz"
-  integrity sha512-4XeMwFf8ZZxmqQQp+U+Nsq2M+cY4Da8Joo/EaMdHVc4uVuWSTJoeidlZ3gDjyxXCjYB1FLcxYwR4lYQAH8emOg==
+shadcn@^4.7.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/shadcn/-/shadcn-4.7.0.tgz#0f5c848ae394de337c762cfcd39b8c44bd2d3937"
+  integrity sha512-70fwnesNrY1GgeD7Kdzn+3SsYeyfibm8immsA5L68+OusoPTvYF01oWExl8/latKpMpvVXcbgdbbE6VFBJQ38w==
   dependencies:
     "@babel/core" "^7.28.0"
     "@babel/parser" "^7.28.0"
@@ -4807,6 +4807,11 @@ switch@^0.0.0:
   version "0.0.0"
   resolved "https://registry.npmjs.org/switch/-/switch-0.0.0.tgz"
   integrity sha512-Pvi4hlAXWHEIT+4XlQEPPIQ02hRzvn38K/cnZ5sZeM11FsDPoXvBD6i/zyVxFK6cgqSlS8sA5/sIwUGp9+ZMhw==
+
+tabs@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/tabs/-/tabs-0.2.0.tgz#470f6f2fa5466064eb1a9501d74c16a883cfbfda"
+  integrity sha512-q6mo8KWq/Zi+zGR3ZvGq6S6ckc3JNbGRGtAwIhtnp2GlS1goTqFnWX3MkyDKYSQuzwBqBAy2fYGHQI+3HMnXZQ==
 
 tagged-tag@^1.0.0:
   version "1.0.0"
