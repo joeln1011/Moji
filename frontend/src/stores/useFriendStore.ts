@@ -3,6 +3,7 @@ import type { FriendState } from '@/types/store';
 import { create } from 'zustand';
 
 export const useFriendStore = create<FriendState>((set, get) => ({
+  friends: [],
   loading: false,
   receivedList: [],
   sentList: [],
@@ -75,6 +76,19 @@ export const useFriendStore = create<FriendState>((set, get) => ({
       }));
     } catch (error) {
       console.log('Error declining friend request:', error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  getFriends: async () => {
+    try {
+      set({ loading: true });
+      const friends = await friendService.getFriendList();
+      set({ friends: friends });
+    } catch (error) {
+      console.log('error when loading friends', error);
+      set({ friends: [] });
     } finally {
       set({ loading: false });
     }

@@ -1,6 +1,7 @@
 import { useFriendStore } from '@/stores/useFriendStore';
 import FriendRequestItem from './FriendRequestItem';
 import { Button } from '../ui/button';
+import { toast } from 'sonner';
 
 const ReceivedRequests = () => {
   const { acceptRequest, declineRequest, loading, receivedList } =
@@ -17,6 +18,7 @@ const ReceivedRequests = () => {
   const handleAccept = async (requestId: string) => {
     try {
       await acceptRequest(requestId);
+      toast.success('Friend request accepted!');
     } catch (error) {
       console.log('Error accepting friend request:', error);
     }
@@ -25,6 +27,7 @@ const ReceivedRequests = () => {
   const handleDecline = async (requestId: string) => {
     try {
       await declineRequest(requestId);
+      toast.info('Friend request declined.');
     } catch (error) {
       console.log('Error declining friend request:', error);
     }
