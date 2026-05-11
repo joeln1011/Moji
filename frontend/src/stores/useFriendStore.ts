@@ -29,7 +29,7 @@ export const useFriendStore = create<FriendState>((set, get) => ({
       return resultMessage;
     } catch (error) {
       console.log('Error sending friend request:', error);
-      return 'Failed to send friend request';
+      throw error;
     } finally {
       set({ loading: false });
     }
