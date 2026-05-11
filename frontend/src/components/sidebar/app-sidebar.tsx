@@ -69,14 +69,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         {/* Group Chat */}
         <SidebarGroup>
-          <SidebarGroupLabel className="uppercase">
-            Group Chat
-          </SidebarGroupLabel>
-          <SidebarGroupAction asChild title="Create New Group">
-            <div>
-              <NewGroupChatModal />
-            </div>
-          </SidebarGroupAction>
+          <div className="flex items-center justify-between">
+            <SidebarGroupLabel className="uppercase">
+              Group Chat
+            </SidebarGroupLabel>
+            <NewGroupChatModal />
+          </div>
           <SidebarGroupContent>
             <GroupChatList />
           </SidebarGroupContent>

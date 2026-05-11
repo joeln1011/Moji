@@ -1,12 +1,14 @@
 import type { Socket } from 'node_modules/socket.io-client/build/esm/socket';
 import type { Conversation, Message } from './chat';
 import type { Friend, FriendRequest, User } from './user';
+import type { L } from 'node_modules/react-router/dist/development/context-DSyS5mLj.d.mts';
 
 export interface AuthState {
   accessToken: string | null;
   user: User | null;
   loading: boolean;
   setAccessToken: (accessToken: string) => void;
+  setUser: (user: User) => void;
   clearState: () => void;
   signUp: (
     username: string,
@@ -100,4 +102,8 @@ export interface FriendState {
   acceptRequest: (requestId: string) => Promise<void>;
   declineRequest: (requestId: string) => Promise<void>;
   getFriends: () => Promise<void>;
+}
+
+export interface UserState {
+  updateAvatarUrl: (formData: FormData) => Promise<void>;
 }
