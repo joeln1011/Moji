@@ -1,54 +1,70 @@
 import Friends from '../models/Friend.js';
 import User from '../models/User.js';
 import FriendRequests from '../models/FriendRequest.js';
+import mongoose from 'mongoose';
 
 export const sendFriendRequests = async (req, res) => {
   try {
     const { to, message } = req.body;
     const from = req.user._id;
+    const fromId = from.toString();
+    const toId = to?.toString().trim();
 
-    if (from === to) {
+    if (!toId || !mongoose.Types.ObjectId.isValid(toId)) {
+      return res.status(400).json({ message: 'Invalid recipient id' });
+    }
+
+    if (fromId === toId) {
       return res
         .status(400)
         .json({ message: 'Cannot send friend request to yourself' });
     }
-    const userExists = await User.exists({ _id: to });
+
+    const userExists = await User.exists({ _id: toId });
     if (!userExists) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    let userA = from.toString();
-    let userB = to.toString();
+    let userA = fromId;
+    let userB = toId;
     if (userA > userB) {
       [userA, userB] = [userB, userA];
     }
+
     const [alreadyFriends, existingRequest] = await Promise.all([
       Friends.findOne({ userA, userB }),
       FriendRequests.findOne({
         $or: [
-          { from, to },
-          { from: to, to: from },
+          { from, to: toId },
+          { from: toId, to: from },
         ],
       }),
     ]);
+
     if (alreadyFriends) {
       return res.status(400).json({ message: 'Already friends' });
     }
+
     if (existingRequest) {
       return res.status(400).json({ message: 'Friend request already exists' });
     }
 
     const request = await FriendRequests.create({
       from,
-      to,
-      message,
+      to: toId,
+      message: message?.toString().trim() || undefined,
     });
+
     return res
       .status(201)
       .json({ message: 'Friend request sent successfully', request });
   } catch (error) {
+    if (error?.code === 11000) {
+      return res.status(400).json({ message: 'Friend request already exists' });
+    }
+
     console.error('Error adding friend:', error);
-    res.status(500).json({ message: 'Failed to add friend' });
+    res.status(500).json({ message: 'Failed to send friend request' });
   }
 };
 
@@ -88,7 +104,7 @@ export const acceptFriendRequests = async (req, res) => {
     });
   } catch (error) {
     console.error('Error accepting friend request:', error);
-    res.status(500).json({ message: 'Failed to accept friend request' });
+    return res.status(500).json({ message: 'Failed to accept friend request' });
   }
 };
 
@@ -111,7 +127,9 @@ export const declineFriendRequests = async (req, res) => {
       .json({ message: 'Friend request declined successfully' });
   } catch (error) {
     console.error('Error declining friend request:', error);
-    res.status(500).json({ message: 'Failed to decline friend request' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to decline friend request' });
   }
 };
 
@@ -133,7 +151,7 @@ export const getAllFriends = async (req, res) => {
     return res.status(200).json({ friends });
   } catch (error) {
     console.error('Error getting all friends:', error);
-    res.status(500).json({ message: 'Failed to get all friends' });
+    return res.status(500).json({ message: 'Failed to get all friends' });
   }
 };
 
@@ -148,6 +166,8 @@ export const getFriendRequests = async (req, res) => {
     res.status(200).json({ sent, received });
   } catch (error) {
     console.error('Error getting all friend requests:', error);
-    res.status(500).json({ message: 'Failed to get all friend requests' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to get all friend requests' });
   }
 };

@@ -1,6 +1,7 @@
 import Conversation from '../models/Conversation.js';
 import Message from '../models/Message.js';
 import { io } from '../socket/index.js';
+import mongoose from 'mongoose';
 
 export const createConversation = async (req, res) => {
   try {
