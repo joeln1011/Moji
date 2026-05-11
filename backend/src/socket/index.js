@@ -29,10 +29,17 @@ io.on('connection', async (socket) => {
   conversationIds.forEach((id) => {
     socket.join(id);
   });
+
+  socket.on('join-conversation', (conversationId) => {
+    socket.join(conversationId);
+  });
+
+  socket.join(user._id.toString());
+
   socket.on('disconnect', () => {
     onlineUsers.delete(user._id);
     io.emit('online-users', Array.from(onlineUsers.keys()));
-    console.log(`${user.displayName} offline with socket ID: ${socket.id}`);
+    // console.log(`${user.displayName} offline with socket ID: ${socket.id}`);
   });
 });
 export { io, app, server };

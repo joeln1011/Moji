@@ -1,6 +1,6 @@
 import Conversation from '../models/Conversation.js';
 import Message from '../models/Message.js';
-import mongoose from 'mongoose';
+import { io } from '../socket/index.js';
 
 export const createConversation = async (req, res) => {
   try {
@@ -21,6 +21,7 @@ export const createConversation = async (req, res) => {
 
     if (type === 'direct') {
       const participantId = memberIds[0];
+
       conversation = await Conversation.findOne({
         type: 'direct',
         'participants.userId': { $all: [userId, participantId] },
@@ -55,7 +56,28 @@ export const createConversation = async (req, res) => {
       { path: 'seenBy', select: 'displayName avatarUrl' },
       { path: 'lastMessage.senderId', select: 'displayName avatarUrl' },
     ]);
-    return res.status(201).json(conversation);
+
+    const participants = (conversation.participants || []).map((p) => ({
+      _id: p.userId?._id,
+      displayName: p.userId?.displayName,
+      avatarUrl: p.userId?.avatarUrl ?? null,
+      joinedAt: p.joinedAt,
+    }));
+
+    const formatted = { ...conversation.toObject(), participants };
+
+    if (type === 'group') {
+      memberIds.forEach((userId) => {
+        io.to(userId).emit('new-group', formatted);
+      });
+    }
+
+    if (type === 'direct') {
+      io.to(userId).emit('new-group', formatted);
+      io.to(memberIds[0]).emit('new-group', formatted);
+    }
+
+    return res.status(201).json({ conversation: formatted });
   } catch (error) {
     console.error('Error creating conversation:', error);
     return res.status(500).json({ message: 'Failed to create conversation' });
