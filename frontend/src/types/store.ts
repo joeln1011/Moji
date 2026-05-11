@@ -41,16 +41,21 @@ export interface ChatState {
   activeConversationId: string | null;
   convoLoading: boolean;
   messageLoading: boolean;
+  loading: boolean;
   reset: () => void;
 
   setActiveConversation: (id: string | null) => void;
+
   fetchConversations: () => Promise<void>;
+
   fetchMessages: (conversationId?: string) => Promise<void>;
+
   sendDirectMessage: (
     recipientId: string,
     content: string,
     imgUrl?: string,
   ) => Promise<void>;
+
   sendGroupMessage: (
     conversationId: string,
     content: string,
@@ -65,6 +70,16 @@ export interface ChatState {
 
   // mark as seen
   markAsSeen: () => Promise<void>;
+
+  // add conversation
+  addConvo: (convo: Conversation) => void;
+
+  // create conversation
+  createConversation: (
+    type: 'group' | 'direct',
+    name: string,
+    memberIds: string[],
+  ) => Promise<void>;
 }
 
 export interface SocketState {

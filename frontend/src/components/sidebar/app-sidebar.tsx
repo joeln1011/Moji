@@ -72,11 +72,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel className="uppercase">
             Group Chat
           </SidebarGroupLabel>
-          <SidebarGroupAction
-            title="Create New Group"
-            className="cursor-pointer"
-          >
-            <NewGroupChatModal />
+          <SidebarGroupAction asChild title="Create New Group">
+            <div>
+              <NewGroupChatModal />
+            </div>
           </SidebarGroupAction>
           <SidebarGroupContent>
             <GroupChatList />
@@ -87,8 +86,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupLabel className="uppercase">Friend</SidebarGroupLabel>
 
-          <SidebarGroupAction title="Add Friend" className="cursor-pointer">
-            <AddFriendModal />
+          <SidebarGroupAction asChild title="Add Friend">
+            <div>
+              <AddFriendModal />
+            </div>
           </SidebarGroupAction>
 
           <SidebarGroupContent>
