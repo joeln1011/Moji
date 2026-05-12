@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { Toaster } from 'sonner';
-import ChatAppPage from './pages/ChatAppPage';
-import SignInPage from './pages/SignInPages';
-import SignUpPage from './pages/SignUpPage';
-import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useThemeStore } from './stores/useThemeStore';
 import { useEffect } from 'react';
 import { useAuthStore } from './stores/useAuthStore';
 import { useSocketStore } from './stores/useSocketStore';
+import ChatAppPage from './pages/ChatAppPage';
+import SignInPage from './pages/SignInPages';
+import SignUpPage from './pages/SignUpPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   const { isDark, setTheme } = useThemeStore();
@@ -16,7 +16,7 @@ function App() {
 
   useEffect(() => {
     setTheme(isDark);
-  }, [isDark]);
+  }, [isDark, setTheme]);
 
   useEffect(() => {
     if (accessToken) {
