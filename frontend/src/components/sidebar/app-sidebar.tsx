@@ -23,11 +23,13 @@ import CreateNewChat from '../chat/CreateNewChat';
 import GroupChatList from '../chat/GroupChatList';
 import { NavUser } from './nav-user';
 import { useAuthStore } from '@/stores/useAuthStore';
+import ConversationSkeleton from '../skeleton/ConversationSkeleton';
+import { useChatStore } from '@/stores/useChatStore';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isDark, toggleTheme } = useThemeStore();
   const { user } = useAuthStore();
-
+  const { convoLoading } = useChatStore();
   return (
     <Sidebar variant="inset" {...props}>
       {/* Header */}
@@ -76,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <NewGroupChatModal />
           </div>
           <SidebarGroupContent>
-            <GroupChatList />
+            {convoLoading ? <ConversationSkeleton /> : <GroupChatList />}
           </SidebarGroupContent>
         </SidebarGroup>
 
@@ -91,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupAction>
 
           <SidebarGroupContent>
-            <DirectMessageList />
+            {convoLoading ? <ConversationSkeleton /> : <DirectMessageList />}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
