@@ -4,8 +4,8 @@
   "main": "src/server.js",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_NO_WARNINGS=1 nodemon src/server.js",
-    "start": "NODE_NO_WARNINGS=1 node src/server.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
   },
   "type": "module",
   "dependencies": {
