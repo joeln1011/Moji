@@ -1,7 +1,6 @@
 import { useUserStore } from '@/stores/useUserStore';
 import { useRef } from 'react';
 import { Button } from '../ui/button';
-import { file } from 'zod';
 import { Camera } from 'lucide-react';
 
 const AvatarUploader = () => {
