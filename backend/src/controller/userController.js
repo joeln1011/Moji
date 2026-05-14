@@ -27,6 +27,34 @@ export const searchUserByUsername = async (req, res) => {
   }
 };
 
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { displayName, username, email, phone, bio } = req.body;
+
+    const updates = {};
+    if (displayName !== undefined) updates.displayName = displayName.trim();
+    if (username !== undefined) updates.username = username.trim().toLowerCase();
+    if (email !== undefined) updates.email = email.trim().toLowerCase();
+    if (phone !== undefined) updates.phone = phone.trim();
+    if (bio !== undefined) updates.bio = bio;
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updates, {
+      new: true,
+      runValidators: true,
+    }).select('-hashedPassword -avatarId');
+
+    return res.status(200).json({ user: updatedUser });
+  } catch (error) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(409).json({ message: `${field} is already taken` });
+    }
+    console.error('Update profile error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 export const uploadAvatar = async (req, res) => {
   try {
     const file = req.file;
