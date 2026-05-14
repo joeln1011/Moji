@@ -5,7 +5,7 @@ import {
   updateConversationAfterCreateMessage,
 } from '../utils/messageHelper.js';
 import { io } from '../socket/index.js';
-import { uploadImageFromBuffer } from '../middlewares/uploadMiddleware.js';
+import { uploadChatImageFromBuffer } from '../middlewares/uploadMiddleware.js';
 
 export const sendDirectMessage = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ export const sendDirectMessage = async (req, res) => {
 
     let imgUrl;
     if (req.file) {
-      const result = await uploadImageFromBuffer(req.file.buffer, 'moji_chat/messages');
+      const result = await uploadChatImageFromBuffer(req.file.buffer);
       imgUrl = result.secure_url;
     }
 
@@ -70,7 +70,7 @@ export const sendGroupMessage = async (req, res) => {
 
     let imgUrl;
     if (req.file) {
-      const result = await uploadImageFromBuffer(req.file.buffer, 'moji_chat/messages');
+      const result = await uploadChatImageFromBuffer(req.file.buffer);
       imgUrl = result.secure_url;
     }
 
