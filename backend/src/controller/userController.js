@@ -64,7 +64,9 @@ export const uploadAvatar = async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const result = await uploadImageFromBuffer(file.buffer);
+    const result = await uploadImageFromBuffer(file.buffer, 'moji_chat/avatars', {
+      transformation: [{ width: 200, height: 200, crop: 'fill' }],
+    });
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
