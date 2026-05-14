@@ -5,25 +5,31 @@ import {
   updateConversationAfterCreateMessage,
 } from '../utils/messageHelper.js';
 import { io } from '../socket/index.js';
-import { create } from 'domain';
+import { uploadChatImageFromBuffer } from '../middlewares/uploadMiddleware.js';
 
 export const sendDirectMessage = async (req, res) => {
   try {
     const { recipientId, content, conversationId } = req.body;
     const senderId = req.user._id;
 
-    let conversation;
-    if (!content) {
+    let imgUrl;
+    if (req.file) {
+      const result = await uploadChatImageFromBuffer(req.file.buffer);
+      imgUrl = result.secure_url;
+    }
+
+    if (!content?.trim() && !imgUrl) {
       return res
         .status(400)
-        .json({ message: 'Message content cannot be empty' });
+        .json({ message: 'Message must have content or an image' });
     }
+
+    let conversation;
     if (conversationId) {
       conversation = await Conversation.findById(conversationId);
     }
 
     if (!conversation) {
-      // check if conversation between users exists
       conversation = await Conversation.create({
         type: 'direct',
         participants: [
@@ -38,7 +44,8 @@ export const sendDirectMessage = async (req, res) => {
     const message = await Message.create({
       conversationId: conversation._id,
       senderId,
-      content,
+      content: content?.trim() || '',
+      imgUrl,
     });
 
     updateConversationAfterCreateMessage(conversation, message, senderId);
@@ -61,16 +68,23 @@ export const sendGroupMessage = async (req, res) => {
 
     const conversation = req.conversation;
 
-    if (!content) {
+    let imgUrl;
+    if (req.file) {
+      const result = await uploadChatImageFromBuffer(req.file.buffer);
+      imgUrl = result.secure_url;
+    }
+
+    if (!content?.trim() && !imgUrl) {
       return res
         .status(400)
-        .json({ message: 'Message content cannot be empty' });
+        .json({ message: 'Message must have content or an image' });
     }
 
     const message = await Message.create({
       conversationId,
       senderId,
-      content,
+      content: content?.trim() || '',
+      imgUrl,
     });
     updateConversationAfterCreateMessage(conversation, message, senderId);
 
