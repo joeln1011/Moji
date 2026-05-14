@@ -21,10 +21,9 @@ io.on('connection', async (socket) => {
   const user = socket.user;
   console.log(`${user.displayName} online with socket ID: ${socket.id}`);
 
-  if (user.showOnlineStatus !== false) {
-    onlineUsers.set(user._id.toString(), socket.id);
-    io.emit('online-users', Array.from(onlineUsers.keys()));
-  }
+  onlineUsers.set(user._id, socket.id);
+
+  io.emit('online-users', Array.from(onlineUsers.keys()));
 
   const conversationIds = await getUserConversationsForSocketIO(user._id);
   conversationIds.forEach((id) => {
@@ -37,19 +36,10 @@ io.on('connection', async (socket) => {
 
   socket.join(user._id.toString());
 
-  socket.on('toggle-online-status', async (showOnlineStatus) => {
-    await user.constructor.findByIdAndUpdate(user._id, { showOnlineStatus });
-    if (showOnlineStatus) {
-      onlineUsers.set(user._id.toString(), socket.id);
-    } else {
-      onlineUsers.delete(user._id.toString());
-    }
-    io.emit('online-users', Array.from(onlineUsers.keys()));
-  });
-
   socket.on('disconnect', () => {
-    onlineUsers.delete(user._id.toString());
+    onlineUsers.delete(user._id);
     io.emit('online-users', Array.from(onlineUsers.keys()));
+    // console.log(`${user.displayName} offline with socket ID: ${socket.id}`);
   });
 });
 export { io, app, server };
