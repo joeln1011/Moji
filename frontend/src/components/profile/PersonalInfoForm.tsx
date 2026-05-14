@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Heart } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Card,
   CardHeader,
@@ -11,6 +13,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import type { User } from '@/types/user';
+import { userService } from '@/services/userService';
+import { useAuthStore } from '@/stores/useAuthStore';
+import axios from 'axios';
 
 type EditableField = {
   key: keyof Pick<User, 'displayName' | 'username' | 'email' | 'phone'>;
@@ -30,7 +35,39 @@ type Props = {
 };
 
 const PersonalInfoForm = ({ userInfo }: Props) => {
+  const { setUser } = useAuthStore();
+  const [formData, setFormData] = useState({
+    displayName: userInfo?.displayName ?? '',
+    username: userInfo?.username ?? '',
+    email: userInfo?.email ?? '',
+    phone: userInfo?.phone ?? '',
+    bio: userInfo?.bio ?? '',
+  });
+  const [saving, setSaving] = useState(false);
+
   if (!userInfo) return null;
+
+  const handleChange =
+    (key: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setFormData((prev) => ({ ...prev, [key]: e.target.value }));
+    };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const updatedUser = await userService.updateProfile(formData);
+      setUser(updatedUser);
+      toast.success('Profile updated');
+    } catch (error) {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.message ?? 'Failed to update profile')
+        : 'Failed to update profile';
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Card className="glass-strong border-border/30">
@@ -52,8 +89,8 @@ const PersonalInfoForm = ({ userInfo }: Props) => {
               <Input
                 id={key}
                 type={type ?? 'text'}
-                value={userInfo[key] ?? ''}
-                onChange={() => {}}
+                value={formData[key]}
+                onChange={handleChange(key)}
                 className="glass-light border-border/30"
               />
             </div>
@@ -65,14 +102,18 @@ const PersonalInfoForm = ({ userInfo }: Props) => {
           <Textarea
             id="bio"
             rows={3}
-            value={userInfo.bio ?? ''}
-            onChange={() => {}}
+            value={formData.bio}
+            onChange={handleChange('bio')}
             className="glass-light border-border/30 resize-none"
           />
         </div>
 
-        <Button className="w-full md:w-auto bg-gradient-primary hover:opacity-90 transition-opacity">
-          Save Changes
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full md:w-auto bg-gradient-primary hover:opacity-90 transition-opacity"
+        >
+          {saving ? 'Saving…' : 'Save Changes'}
         </Button>
       </CardContent>
     </Card>
