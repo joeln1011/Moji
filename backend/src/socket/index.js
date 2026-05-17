@@ -16,14 +16,21 @@ app.set('io', io);
 io.use(socketAuthMiddleware);
 
 const onlineUsers = new Map(); //{userId: socketId}
+const invisibleUsers = new Set(); // userIds who hide their online status
+
+const broadcastOnlineUsers = () => {
+  const visible = Array.from(onlineUsers.keys()).filter(
+    (id) => !invisibleUsers.has(id),
+  );
+  io.emit('online-users', visible);
+};
 
 io.on('connection', async (socket) => {
   const user = socket.user;
   console.log(`${user.displayName} online with socket ID: ${socket.id}`);
 
   onlineUsers.set(user._id, socket.id);
-
-  io.emit('online-users', Array.from(onlineUsers.keys()));
+  broadcastOnlineUsers();
 
   const conversationIds = await getUserConversationsForSocketIO(user._id);
   conversationIds.forEach((id) => {
@@ -34,12 +41,21 @@ io.on('connection', async (socket) => {
     socket.join(conversationId);
   });
 
+  socket.on('set-visibility', ({ visible }) => {
+    if (visible) {
+      invisibleUsers.delete(user._id);
+    } else {
+      invisibleUsers.add(user._id);
+    }
+    broadcastOnlineUsers();
+  });
+
   socket.join(user._id.toString());
 
   socket.on('disconnect', () => {
     onlineUsers.delete(user._id);
-    io.emit('online-users', Array.from(onlineUsers.keys()));
-    // console.log(`${user.displayName} offline with socket ID: ${socket.id}`);
+    invisibleUsers.delete(user._id);
+    broadcastOnlineUsers();
   });
 });
 export { io, app, server };
