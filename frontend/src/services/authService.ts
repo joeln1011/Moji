@@ -42,4 +42,8 @@ export const authService = {
     const res = await api.post('auth/refresh', { withCredentials: true });
     return res.data.accessToken;
   },
+
+  deleteAccount: async () => {
+    return api.delete('/auth/account', { withCredentials: true });
+  },
 };
