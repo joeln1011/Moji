@@ -19,6 +19,7 @@ export interface AuthState {
 
   signIn: (username: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   fetchMe: () => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -54,13 +55,13 @@ export interface ChatState {
   sendDirectMessage: (
     recipientId: string,
     content: string,
-    imgUrl?: string,
+    image?: File,
   ) => Promise<void>;
 
   sendGroupMessage: (
     conversationId: string,
     content: string,
-    imgUrl?: string,
+    image?: File,
   ) => Promise<void>;
 
   //add message
@@ -86,8 +87,10 @@ export interface ChatState {
 export interface SocketState {
   socket: Socket | null;
   onlineUsers: string[];
+  showOnlineStatus: boolean;
   connectSocket: () => void;
   disconnectSocket: () => void;
+  setShowOnlineStatus: (show: boolean) => void;
 }
 
 export interface FriendState {

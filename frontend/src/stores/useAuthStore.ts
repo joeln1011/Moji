@@ -81,6 +81,20 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      deleteAccount: async () => {
+        try {
+          set({ loading: true });
+          await authService.deleteAccount();
+          get().clearState();
+          toast.success('Account deleted successfully');
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to delete account. Please try again.');
+        } finally {
+          set({ loading: false });
+        }
+      },
+
       fetchMe: async () => {
         try {
           set({ loading: true });

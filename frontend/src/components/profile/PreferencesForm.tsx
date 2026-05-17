@@ -9,13 +9,11 @@ import {
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useThemeStore } from '@/stores/useThemeStore';
-import { useState } from 'react';
+import { useSocketStore } from '@/stores/useSocketStore';
 
 const PreferencesForm = () => {
   const { isDark, toggleTheme } = useThemeStore();
-
-  //   handle logic for online status
-  const [onlineStatus, setOnlineStatus] = useState(false);
+  const { showOnlineStatus, setShowOnlineStatus } = useSocketStore();
 
   return (
     <Card className="glass-strong border-border/30">
@@ -62,8 +60,8 @@ const PreferencesForm = () => {
           </div>
           <Switch
             id="online-status"
-            checked={onlineStatus}
-            onCheckedChange={setOnlineStatus}
+            checked={showOnlineStatus}
+            onCheckedChange={setShowOnlineStatus}
             className="data-[state=checked]:bg-primary-glow"
           />
         </div>

@@ -22,29 +22,29 @@ export const chatService = {
   async sendDirectMessage(
     recipientId: string,
     content: string,
-    imgUrl?: string,
+    image?: File,
     conversationId?: string,
   ) {
-    const res = await api.post('/messages/direct', {
-      recipientId,
-      content,
-      imgUrl,
-      conversationId,
-    });
-    return res.data.message;
+    const formData = new FormData();
+    formData.append('recipientId', recipientId);
+    if (content) formData.append('content', content);
+    if (image) formData.append('image', image);
+    if (conversationId) formData.append('conversationId', conversationId);
+    const res = await api.post('/messages/direct', formData);
+    return res.data;
   },
 
   async sendGroupMessage(
     conversationId: string,
     content: string = '',
-    imgUrl?: string,
+    image?: File,
   ) {
-    const res = await api.post('/messages/group', {
-      conversationId,
-      content,
-      imgUrl,
-    });
-    return res.data.message;
+    const formData = new FormData();
+    formData.append('conversationId', conversationId);
+    if (content) formData.append('content', content);
+    if (image) formData.append('image', image);
+    const res = await api.post('/messages/group', formData);
+    return res.data;
   },
 
   async markAsSeen(conversationId: string) {
