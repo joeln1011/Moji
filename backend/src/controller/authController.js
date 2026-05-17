@@ -117,6 +117,19 @@ export const signOut = async (req, res) => {
   }
 };
 
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    await Session.deleteMany({ userId });
+    await User.findByIdAndDelete(userId);
+    res.clearCookie('refreshToken');
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error('Delete Account error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 // creeate new access token using refresh token
 export const refreshToken = async (req, res) => {
   try {
